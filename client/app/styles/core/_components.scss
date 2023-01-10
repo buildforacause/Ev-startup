@@ -1,0 +1,124 @@
+/* start dropdown confirm styles */
+.dropdown-confirm {
+  .dropdown-action {
+    position: relative;
+    border: $border-default;
+    border-radius: $border-radius-default;
+    background-color: $btn-bg;
+    -webkit-transition: $layout-transition-speed;
+    transition: $layout-transition-speed;
+
+    &.sm {
+      padding: 6px 10px;
+      min-width: 100px;
+
+      .btn-text {
+        font-size: $font-size-x-small;
+      }
+    }
+
+    &.md {
+      padding: 10px 16px;
+      min-width: 135px;
+    }
+
+    .btn-text {
+      -webkit-transition: $layout-transition-speed;
+      transition: $layout-transition-speed;
+    }
+
+    &:hover {
+      background-color: $secondary-bg;
+      color: $font-custom-color !important;
+
+      .btn-text {
+        -webkit-transition: $layout-transition-speed;
+        transition: $layout-transition-speed;
+      }
+    }
+  }
+
+  .btn-group {
+    &.show {
+      .dropdown-action {
+        background-color: $secondary-bg;
+      }
+    }
+  }
+
+  .dropdown-menu {
+    min-width: 250px;
+  }
+
+  .nav-link {
+    padding: 0;
+  }
+}
+/* end dropdown confirm styles */
+
+/* start pagination styles */
+.pagination-box {
+  overflow-x: scroll;
+  overflow-y: hidden;
+
+  @include hide-scrollbar();
+
+  .page-link {
+    white-space: nowrap;
+  }
+}
+
+.pagination {
+  .page-item {
+    &.active {
+      .page-link {
+        color: $white !important;
+        background-color: $primary-bg;
+      }
+    }
+  }
+}
+/* end pagination styles */
+
+/* start slider styles */
+.slider {
+  .rc-slider-mark-text {
+    .fa {
+      color: $stars;
+    }
+  }
+
+  .rc-slider-mark-text-active {
+    .fa {
+      color: $stars-active;
+    }
+  }
+
+  .rc-slider-track {
+    background-color: $success-bg;
+  }
+
+  .rc-slider-dot-active {
+    border-color: $success-bg;
+  }
+  .rc-slider-handle-dragging.rc-slider-handle-dragging.rc-slider-handle-dragging {
+    box-shadow: none;
+    border-color: $success-bg;
+  }
+
+  .rc-slider-handle-click-focused:focus {
+    border-color: $success-bg;
+    border: solid 2px $success-bg;
+  }
+
+  .rc-slider-handle {
+    box-shadow: none;
+    border-color: $success-bg;
+
+    &:active,
+    &:hover {
+      border-color: $success-bg;
+    }
+  }
+}
+/* end slider styles */
