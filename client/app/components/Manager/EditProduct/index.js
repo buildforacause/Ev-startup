@@ -87,6 +87,19 @@ const EditProduct = props => {
               }}
             />
           </Col>
+          <Col xs='12'>
+            <Input
+              type={'text'}
+              error={formErrors['dimensions']}
+              label={'Dimensions'}
+              name={'dimensions'}
+              placeholder={'L x B x H'}
+              value={product.dimensions}
+              onInputChange={(name, value) => {
+                productChange(name, value);
+              }}
+            />
+          </Col>
           <Col xs='12' md='12'>
             <Input
               type={'textarea'}
@@ -155,7 +168,7 @@ const EditProduct = props => {
               />
             </Col>
           )}
-          <Col xs='12' md='12' className='mt-3 mb-2'>
+          <Col xs='6' md='6' className='mt-3 mb-2'>
             <Switch
               id={`enable-product-${product._id}`}
               name={'isActive'}
@@ -164,6 +177,18 @@ const EditProduct = props => {
               toggleCheckboxChange={value => {
                 productChange('isActive', value);
                 activateProduct(product._id, value);
+              }}
+            />
+          </Col>
+          <Col xs='6' md='6' className='mt-3 mb-2'>
+            <Switch
+              id={`featured-product-${product._id}`}
+              name={'featured'}
+              label={'Featured?'}
+              checked={product.featured}
+              toggleCheckboxChange={value => {
+                productChange('featured', value);
+                featureProduct(product._id, value);
               }}
             />
           </Col>

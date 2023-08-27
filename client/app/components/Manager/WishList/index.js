@@ -23,8 +23,8 @@ const WishList = props => {
           <img
             className='item-image'
             src={`${
-              product.imageUrl
-                ? product.imageUrl
+              product.imageUrl[0]
+                ? product.imageUrl[0]
                 : '/images/placeholder-image.png'
             }`}
           />

@@ -24,11 +24,15 @@ const ProductSchema = new Schema({
     slug: 'name',
     unique: true
   },
-  imageUrl: {
-    type: String
-  },
   imageKey: {
     type: String
+  },
+  dimensions: {
+    type: String
+  },
+  imageUrl: {
+     type : Array , 
+     default : [] 
   },
   description: {
     type: String,
@@ -47,6 +51,10 @@ const ProductSchema = new Schema({
   isActive: {
     type: Boolean,
     default: true
+  },
+  featured: {
+    type: Boolean,
+    default: false
   },
   brand: {
     type: Schema.Types.ObjectId,

@@ -1,26 +1,96 @@
 const express = require('express');
 const router = express.Router();
 const Mongoose = require('mongoose');
+const crypto = require("crypto");
+const Razorpay = require("razorpay");
 
 // Bring in Models & Utils
 const Order = require('../../models/order');
 const Cart = require('../../models/cart');
 const Product = require('../../models/product');
+const Payment = require('../../models/payment');
 const auth = require('../../middleware/auth');
+const keys = require("../../config/keys");
 const mailgun = require('../../services/mailgun');
 const store = require('../../utils/store');
 const { ROLES, CART_ITEM_STATUS } = require('../../constants');
+const instance = new Razorpay({
+  key_id: process.env.REACT_APP_RAZORPAY_API_KEY,
+  key_secret: process.env.REACT_APP_RAZORPAY_API_SECRET,
+});
+
+
+// payment
+
+router.get("/getkey/hahaha", async(req, res) => {
+  res.status(200).json({
+    key: keys.razorpay.key
+  })
+})
+
+router.post('/checkout/:amt', auth, async (req, res) => {
+try{
+  const options = {
+    amount: Number(req.params.amt * 100),
+    currency: "INR",
+  };
+  const order = await instance.orders.create(options);
+  res.status(200).json({
+    success: true,
+    order,
+  });
+}catch(e){
+  res.status(400).json({
+    error: e
+  })
+}
+})
+
+
+router.post("/verify/payment/", async (req, res) => {
+  const { razorpay_order_id, razorpay_payment_id, razorpay_signature } = req.body;
+  const body = razorpay_order_id + "|" + razorpay_payment_id;
+  const expectedSignature = crypto
+    .createHmac("sha256", keys.razorpay.secret)
+    .update(body.toString())
+    .digest("hex");
+  const isAuthentic = expectedSignature === razorpay_signature;
+
+  if (isAuthentic) {
+    await Payment.create({
+      razorpay_order_id,
+      razorpay_payment_id,
+      razorpay_signature,
+    });
+
+    res.status(200).json({
+      success: true,
+      razorpay_order_id: razorpay_order_id,
+      razorpay_payment_id: razorpay_payment_id
+    })
+    // res.redirect(`/paymentverified/${razorpay_order_id}/${address}`);
+  } else {
+    res.status(400).json({
+      success: false,
+    });
+  }
+})
+
 
 router.post('/add', auth, async (req, res) => {
   try {
     const cart = req.body.cartId;
     const total = req.body.total;
     const user = req.user._id;
+    const address = req.body.address;
+    const razorpay_order_id = req.body.razorpay_order_id;
 
     const order = new Order({
-      cart,
-      user,
-      total
+      cart: cart,
+      razorpay_order_id: razorpay_order_id,
+      address: address,
+      user: user,
+      total: total
     });
 
     const orderDoc = await order.save();

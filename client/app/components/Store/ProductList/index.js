@@ -12,7 +12,6 @@ import AddToWishList from '../AddToWishList';
 
 const ProductList = props => {
   const { products, updateWishlist, authenticated } = props;
-
   return (
     <div className='product-list'>
       {products.map((product, index) => (
@@ -39,8 +38,8 @@ const ProductList = props => {
                       <img
                         className='item-image'
                         src={`${
-                          product.imageUrl
-                            ? product.imageUrl
+                          product.imageUrl[0]
+                            ? product.imageUrl[0]
                             : '/images/placeholder-image.png'
                         }`}
                       />
@@ -51,14 +50,14 @@ const ProductList = props => {
                       <h1 className='item-name'>{product.name}</h1>
                       {product.brand && Object.keys(product.brand).length > 0 && (
                         <p className='by'>
-                          By <span>{product.brand.name}</span>
+                          Category: <span>{product.brand.name}</span>
                         </p>
                       )}
-                      <p className='item-desc mb-0'>{product.description}</p>
+                      <p className='item-desc mb-0'>{product.description.slice(0, 20)}...</p>
                     </div>
                   </div>
                   <div className='d-flex flex-row justify-content-between align-items-center px-4 mb-2 item-footer'>
-                    <p className='price mb-0'>${product.price}</p>
+                    <p className='price mb-0'>₹{product.price}</p>
                     {product.totalReviews > 0 && (
                       <p className='mb-0'>
                         <span className='fs-16 fw-normal mr-1'>

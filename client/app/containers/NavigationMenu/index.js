@@ -5,13 +5,11 @@
  */
 
 import React from 'react';
-
 import { connect } from 'react-redux';
 import { NavLink } from 'react-router-dom';
-import { Container } from 'reactstrap';
+import {   Container } from 'reactstrap';
 
 import actions from '../../actions';
-
 import Button from '../../components/Common/Button';
 import { CloseIcon } from '../../components/Common/Icon';
 
@@ -39,9 +37,11 @@ class NavigationMenu extends React.PureComponent {
         <div className='menu-body'>
           <Container>
             <h3 className='menu-title'>Shop By Category</h3>
-            <nav role='navigation'>
+            {/* <nav role='navigation'> */}
+
               <ul className='menu-list'>
                 {categories.map((link, index) => (
+                  
                   <li key={index} className='menu-item'>
                     <NavLink
                       onClick={handleCategoryClick}
@@ -49,12 +49,14 @@ class NavigationMenu extends React.PureComponent {
                       activeClassName='active-link'
                       exact
                     >
-                      {link.name}
+                      {link.catname}
                     </NavLink>
                   </li>
                 ))}
               </ul>
-            </nav>
+
+
+            {/* </nav> */}
           </Container>
         </div>
       </div>

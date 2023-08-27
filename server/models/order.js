@@ -7,6 +7,13 @@ const OrderSchema = new Schema({
     type: Schema.Types.ObjectId,
     ref: 'Cart'
   },
+  razorpay_order_id: {
+    type: String
+  },
+  deliver_to: {
+    type: Schema.Types.ObjectId,
+    ref: 'Address'
+  },
   user: {
     type: Schema.Types.ObjectId,
     ref: 'User'

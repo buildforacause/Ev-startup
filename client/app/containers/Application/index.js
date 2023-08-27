@@ -26,6 +26,8 @@ import ForgotPassword from '../ForgotPassword';
 import ResetPassword from '../ResetPassword';
 import Shop from '../Shop';
 import BrandsPage from '../BrandsPage';
+import Checkout from '../Checkout';
+import SubCatPage from '../SubCatPage';
 import ProductPage from '../ProductPage';
 import Sell from '../Sell';
 import Contact from '../Contact';
@@ -36,6 +38,9 @@ import AuthSuccess from '../AuthSuccess';
 import Footer from '../../components/Common/Footer';
 import Page404 from '../../components/Common/Page404';
 import { CART_ITEMS } from '../../constants';
+import Terms from '../Terms';
+import Returns from '../Returns';
+import Privacy from '../Privacy';
 
 class Application extends React.PureComponent {
   constructor(props) {
@@ -86,11 +91,16 @@ class Application extends React.PureComponent {
                 <Route path='/sell' component={Sell} />
                 <Route path='/contact' component={Contact} />
                 <Route path='/brands' component={BrandsPage} />
+                <Route path='/sub/:slug' component={SubCatPage} />
                 <Route path='/product/:slug' component={ProductPage} />
                 <Route path='/order/success/:id' component={OrderSuccess} />
                 <Route path='/order/:id' component={OrderPage} />
                 <Route path='/login' component={Login} />
                 <Route path='/register' component={Signup} />
+                <Route path='/checkout/address' component={Checkout} />
+                <Route path='/terms' component={Terms} />
+                <Route path='/return/policy' component={Returns} />
+                <Route path='/privacy/policy' component={Privacy} />
                 <Route
                   path='/merchant-signup/:token'
                   component={MerchantSignup}

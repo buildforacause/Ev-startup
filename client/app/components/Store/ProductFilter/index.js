@@ -9,10 +9,7 @@ import { Card, CardBody, CardHeader } from 'reactstrap';
 
 import RangeSlider from '../../Common/RangeSlider';
 
-const priceMarks = {
-  1: { label: <p className='fw-normal text-black'>$1</p> },
-  5000: { label: <p className='fw-normal text-black'>$5000</p> }
-};
+
 
 const rateMarks = {
   0: {
@@ -81,9 +78,17 @@ const rating = v => {
 };
 
 const ProductFilter = props => {
-  const { filterProducts } = props;
+  const { filterProducts, minmax } = props;
+  const min = minmax.min
+  const max = minmax.max
+  const priceMarks = {
+    [min]: { label: <p className='fw-normal text-black'>₹{min}</p> },
+    [max]: { label: <p className='fw-normal text-black'>₹{max}</p> }
+  };
 
   return (
+    <>
+    {min !== undefined && (
     <div className='product-filter'>
       <Card className='mb-4'>
         <CardHeader tag='h3'>Price</CardHeader>
@@ -91,8 +96,9 @@ const ProductFilter = props => {
           <div className='mx-2 mb-3'>
             <RangeSlider
               marks={priceMarks}
-              defaultValue={[1, 2500]}
-              max={5000}
+              defaultValue={[min, max]}
+              max={max}
+              min={min}
               onChange={v => {
                 filterProducts('price', v);
               }}
@@ -108,7 +114,7 @@ const ProductFilter = props => {
               type='slider'
               marks={rateMarks}
               step={20}
-              defaultValue={[100]}
+              defaultValue={[100, 0]}
               onChange={v => {
                 filterProducts('rating', rating(v));
               }}
@@ -117,6 +123,8 @@ const ProductFilter = props => {
         </CardBody>
       </Card>
     </div>
+    )}
+    </>
   );
 };
 

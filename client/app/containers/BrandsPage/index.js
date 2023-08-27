@@ -15,14 +15,14 @@ import BrandList from '../../components/Store/BrandList';
 class BrandsPage extends React.PureComponent {
   componentDidMount() {
     this.props.fetchStoreBrands();
+    this.props.fetchBrandsSelect();
   }
 
   render() {
-    const { brands } = this.props;
-
+    const { brands, brandnames } = this.props;
     return (
       <div className='brands-page'>
-        <BrandList brands={brands} />
+        <BrandList brands={brands} brandnames={brandnames} />
       </div>
     );
   }
@@ -30,7 +30,8 @@ class BrandsPage extends React.PureComponent {
 
 const mapStateToProps = state => {
   return {
-    brands: state.brand.storeBrands
+    brands: state.brand.storeBrands,
+    brandnames: state.brand.brandsSelect
   };
 };
 

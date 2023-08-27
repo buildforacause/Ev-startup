@@ -2,23 +2,33 @@ const express = require('express');
 const router = express.Router();
 const multer = require('multer');
 const Mongoose = require('mongoose');
+const { Apriori, Itemset, IAprioriResults } = require('node-apriori');
 
 // Bring in Models & Utils
 const Product = require('../../models/product');
 const Brand = require('../../models/brand');
 const Category = require('../../models/category');
+const Pincode = require("../../models/pincode");
+const Cart = require('../../models/cart');
 const auth = require('../../middleware/auth');
 const role = require('../../middleware/role');
 const checkAuth = require('../../utils/auth');
-const { s3Upload } = require('../../utils/storage');
 const {
   getStoreProductsQuery,
   getStoreProductsWishListQuery
 } = require('../../utils/queries');
 const { ROLES } = require('../../constants');
 
-const storage = multer.memoryStorage();
-const upload = multer({ storage });
+// const storage = multer.memoryStorage();
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, './uploads')
+  },
+  filename: function (req, file, cb) {
+    cb(null, file.originalname + Date.now())
+  }
+})
+const upload = multer({ storage:storage});
 
 // fetch product slug api
 router.get('/item/:slug', async (req, res) => {
@@ -57,8 +67,7 @@ router.get('/list/search/:name', async (req, res) => {
     const name = req.params.name;
 
     const productDoc = await Product.find(
-      { name: { $regex: new RegExp(name), $options: 'is' }, isActive: true },
-      { name: 1, slug: 1, imageUrl: 1, price: 1, _id: 0 }
+      { name: { $regex: new RegExp(name), $options: 'is' }, isActive: true }
     );
 
     if (productDoc.length < 0) {
@@ -69,6 +78,30 @@ router.get('/list/search/:name', async (req, res) => {
 
     res.status(200).json({
       products: productDoc
+    });
+  } catch (error) {
+    res.status(400).json({
+      error: 'Your request could not be processed. Please try again.'
+    });
+  }
+});
+
+// fetch product name search1 api
+router.get('/list/search1/:name', async (req, res) => {
+  try {
+    const name = req.params.name;
+
+    const productDoc = await Product.find(
+      { name: { $regex: new RegExp(name), $options: 'is' }, isActive: true }
+    );
+
+    if (productDoc.length < 0) {
+      return res.status(404).json({
+        message: 'No product found.'
+      });
+    }
+    res.status(200).json({
+      products: productDoc[0]
     });
   } catch (error) {
     res.status(400).json({
@@ -253,12 +286,74 @@ router.get('/list/select', auth, async (req, res) => {
   }
 });
 
+
+router.get("/minmaxprice", async(req, res) => {
+  try{
+    let maxprod = await Product.find({}).sort({"price" : -1}).limit(1);
+    let minprod = await Product.find({}).sort({"price" : 1}).limit(1);
+    res.status(200).json({"max" : maxprod[0].price, "min": minprod[0].price})
+  }catch(e){
+    res.status(400).json({
+      error: "Something Went Wrong"
+    })
+  }
+})
+
+
+router.get("/apriori/trending", async(req, res) => {
+  // Fetch all carts from the database
+  Cart.find({}, (err, carts) => {
+    if (err) throw err;
+    // Extract all unique products in the carts
+    var products = [...new Set(carts.flatMap(cart => cart.products))];
+    
+    products = products.map((e)=> {
+      return Mongoose.Types.ObjectId(e.product)
+    })
+    // Fetch product names from the database
+    Product.find({_id: {$in: products}}, (err, products) => {
+      if (err) throw err;
+      // Convert products array to object for faster lookups
+      const productMap = products.reduce((map, product) => {
+        map[product._id] = product.name;
+        return map;
+      }, {});
+      
+  
+      // Convert carts to transactions for Apriori
+      const transactions = carts.map(cart => cart.products.map(product => productMap[product.product]));
+      const apriori = new Apriori(0.4);
+  
+   
+  // Execute Apriori on a given set of transactions.
+  apriori.exec(transactions).then( (result) => {
+          res.status(200).json({ result })
+      });
+    });
+  });
+  
+  })
+
+
+router.get('/list/featured', async (req, res) => {
+  try {
+    const products = await Product.find({featured: true});
+    res.status(200).json({
+      products
+    });
+  } catch (error) {
+    res.status(400).json({
+      error: 'Your request could not be processed. Please try again.'
+    });
+  }
+});
+
 // add product api
 router.post(
   '/add',
   auth,
   role.check(ROLES.Admin, ROLES.Merchant),
-  upload.single('image'),
+  upload.array('image'),
   async (req, res) => {
     try {
       const sku = req.body.sku;
@@ -268,17 +363,19 @@ router.post(
       const price = req.body.price;
       const taxable = req.body.taxable;
       const isActive = req.body.isActive;
+      const featured = req.body.featured;
       const brand = req.body.brand;
-      const image = req.file;
+      const dimensions = req.body.dimensions;
+      const images = req.files;
 
       if (!sku) {
         return res.status(400).json({ error: 'You must enter sku.' });
       }
 
-      if (!description || !name) {
+      if (!description || !name || !dimensions) {
         return res
           .status(400)
-          .json({ error: 'You must enter description & name.' });
+          .json({ error: 'You must enter description, name and dimensions of the product.' });
       }
 
       if (!quantity) {
@@ -296,20 +393,25 @@ router.post(
       }
 
       // const { imageUrl, imageKey } = await s3Upload(image);
-      const imageUrl = "https://images.pexels.com/photos/674010/pexels-photo-674010.jpeg?cs=srgb&dl=pexels-anjana-c-674010.jpg&fm=jpg"
-      const imageKey = "hahah"
-
+      let imageUrl = [];
+      for(const image of images){
+        imageUrl.push("/uploads/" + image.filename);
+      };
+      
+      const imageKey = "manpasand"
       const product = new Product({
-        sku,
-        name,
-        description,
-        quantity,
-        price,
-        taxable,
-        isActive,
-        brand,
-        imageUrl,
-        imageKey
+        sku:sku,
+        name:name,
+        description:description,
+        quantity:quantity,
+        price:price,
+        taxable:taxable,
+        isActive:isActive,
+        featured:featured,
+        brand:brand,
+        imageUrl:imageUrl,
+        imageKey:imageKey,
+        dimensions:dimensions
       });
 
       const savedProduct = await product.save();
@@ -320,8 +422,9 @@ router.post(
         product: savedProduct
       });
     } catch (error) {
+      console.log(error);
       return res.status(400).json({
-        error: 'Your request could not be processed. Please try again.'
+        error: 'Your request could not be processed. Please try again',
       });
     }
   }
@@ -484,6 +587,32 @@ router.put(
   }
 );
 
+router.put(
+  '/:id/featured',
+  auth,
+  role.check(ROLES.Admin, ROLES.Merchant),
+  async (req, res) => {
+    try {
+      const productId = req.params.id;
+      const update = req.body.product;
+      const query = { _id: productId };
+
+      await Product.findOneAndUpdate(query, update, {
+        new: true
+      });
+
+      res.status(200).json({
+        success: true,
+        message: 'Product has been updated successfully!'
+      });
+    } catch (error) {
+      res.status(400).json({
+        error: 'Your request could not be processed. Please try again.'
+      });
+    }
+  }
+);
+
 router.delete(
   '/delete/:id',
   auth,
@@ -504,5 +633,164 @@ router.delete(
     }
   }
 );
+
+// Pincode logic
+
+router.get("/checkpin/:pincode", async(req,res) => {
+    const pincode = req.params.pincode;
+    const pincodeDoc = await Pincode.find(
+      {pincode: pincode}
+    );
+    if (pincodeDoc.length < 1) {
+      return res.json({
+        txt: 'Delivery not available.',
+        disable: true,
+        txt_color: 'red'
+      });
+    }
+
+    return res.json({
+      txt: 'Delivery is available.',
+      disable: false,
+      txt_color: 'green'
+    });
+})
+
+router.get("/getpincode/:pincode", async (req, res) => {
+  try {
+    const pincode = req.params.pincode;
+      let pincodeDoc = await Pincode.find(
+        {pincode: pincode}
+      );  
+      return res.json({
+        pincode: pincodeDoc,
+      });
+  } catch (error) {
+    return res.json({
+      error: 'Your request could not be processed. Please try again.' + error
+    });
+  }
+
+});
+
+router.get("/pincode/:pincode", async (req, res) => {
+  try {
+    const pincode = req.params.pincode;
+    let pincodeDoc = [];
+    if (pincode === "all"){
+      pincodeDoc = await Pincode.find(
+        {}
+      );  
+      return res.status(200).json({
+         pincodes: pincodeDoc
+      });
+      
+    }
+    else{
+      pincodeDoc = await Pincode.find(
+        {_id: pincode}
+      );  
+      return res.json({
+        pincode: pincodeDoc,
+      });
+    }
+
+    
+  } catch (error) {
+    return res.json({
+      error: 'Your request could not be processed. Please try again.' + error
+    });
+  }
+
+});
+
+router.post('/pincode/add', auth, role.check(ROLES.Admin), async (req, res) => {
+    try {
+      const pincode = req.body.pincode;
+      const cost = req.body.cost;
+
+      if (!pincode) {
+        return res.status(400).json({ error: 'You must enter pincode.' });
+      }
+
+      if (!cost) {
+        return res.status(400).json({ error: 'You must enter shipping cost.' });
+      }
+
+      const pincodeFound = await Pincode.find({ pincode: pincode });
+
+      if (pincodeFound.length > 0) {
+        return res.status(400).json({ error: 'This pincode is already added.' });
+      }
+
+      const pin = new Pincode({
+        pincode: pincode,
+        cost: cost
+      });
+
+      const savedPin = await pin.save();
+
+      res.status(200).json({
+        success: true,
+        message: `Pincode has been added successfully!`,
+        pincode: savedPin
+      });
+    } catch (error) {
+      return res.status(400).json({
+        error: 'Your request could not be processed. Please try again',
+      });
+    }
+  }
+);
+
+
+router.put(
+  '/pincode/edit/:id',
+  auth,
+  role.check(ROLES.Admin, ROLES.Merchant),
+  async (req, res) => {
+    try {
+      const pincodeId = req.params.id;
+      const update = req.body.pincode;
+      const query = { _id: pincodeId };
+
+      await Pincode.findOneAndUpdate(query, update, {
+        new: true
+      });
+
+      res.status(200).json({
+        success: true,
+        message: 'Pincode has been updated successfully!'
+      });
+    } catch (error) {
+      res.status(400).json({
+        error: 'Your request could not be processed. Please try again.'
+      });
+    }
+  }
+);
+
+
+router.delete(
+  '/pincode/delete/:id',
+  auth,
+  role.check(ROLES.Admin),
+  async (req, res) => {
+    try {
+      const pincode = await Pincode.deleteOne({ _id: req.params.id });
+
+      res.status(200).json({
+        success: true,
+        message: `Pincode has been deleted successfully!`,
+        pincode
+      });
+    } catch (error) {
+      res.status(400).json({
+        error: 'Your request could not be processed. Please try again.' + error
+      });
+    }
+  }
+);
+
 
 module.exports = router;

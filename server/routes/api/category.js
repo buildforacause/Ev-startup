@@ -43,12 +43,46 @@ router.post('/add', auth, role.check(ROLES.Admin), (req, res) => {
   });
 });
 
-// fetch store categories api
-router.get('/list', async (req, res) => {
+
+router.get('/customlist/:id', async (req, res) => {
   try {
-    const categories = await Category.find({ isActive: true });
+    const categories = await Category.find({ products: req.params.id });
     res.status(200).json({
       categories
+    });
+  } catch (error) {
+    res.status(400).json({
+      error: 'Your request could not be processed. Please try again.'
+    });
+  }
+});
+
+
+// fetch store categories api
+router.get('/list/:slug', async (req, res) => {
+  try {
+    const categories = await Category.find({ isActive: true }).populate("products").populate({ 
+      path: 'products',
+      populate: {
+        path: 'brand'
+      } 
+   });
+    let responsetogive = []
+    let subcats = [];
+    categories.map((e)=>{
+        let parentslug = "";
+        let parentbrand = "";
+        e.products.map((a)=>{
+          parentbrand = a.brand.name;
+          parentslug = a.brand.slug;
+          if(parentslug === req.params.slug){
+            subcats.push({"name": e.name, "slug": e.slug})
+          }
+        })
+        subcats = [...new Set(subcats)]
+    })
+    res.status(200).json({
+    responsetogive: subcats
     });
   } catch (error) {
     res.status(400).json({

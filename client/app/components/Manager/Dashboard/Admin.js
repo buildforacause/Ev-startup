@@ -14,7 +14,7 @@ import Page404 from '../../Common/Page404';
 
 import Account from '../../../containers/Account';
 import AccountSecurity from '../../../containers/AccountSecurity';
-import Address from '../../../containers/Address';
+import Pincode from '../../../containers/Pincode';
 import Order from '../../../containers/Order';
 import Users from '../../../containers/Users';
 import Category from '../../../containers/Category';
@@ -36,7 +36,7 @@ const Admin = props => {
             <Switch>
               <Route exact path='/dashboard' component={Account} />
               <Route path='/dashboard/security' component={AccountSecurity} />
-              <Route path='/dashboard/address' component={Address} />
+              <Route path='/dashboard/pincode' component={Pincode} />
               <Route path='/dashboard/product' component={Product} />
               <Route path='/dashboard/category' component={Category} />
               <Route path='/dashboard/brand' component={Brand} />
@@ -44,7 +44,7 @@ const Admin = props => {
               <Route path='/dashboard/merchant' component={Merchant} />
               <Route path='/dashboard/orders' component={Order} />
               {/* <Route path='/dashboard/review' component={Review} /> */}
-              <Route path='/dashboard/wishlist' component={Wishlist} />
+              {/* <Route path='/dashboard/wishlist' component={Wishlist} /> */}
               <Route path='*' component={Page404} />
             </Switch>
           </div>

@@ -65,6 +65,19 @@ const AddProduct = props => {
               }}
             />
           </Col>
+          <Col xs='12' lg='6'>
+            <Input
+              type={'text'}
+              error={formErrors['dimensions']}
+              label={'Dimensions'}
+              name={'dimensions'}
+              placeholder={'Length x Breadth x Height eg: 4x5x5'}
+              value={productFormData.dimensions}
+              onInputChange={(name, value) => {
+                productChange(name, value);
+              }}
+            />
+          </Col>
           <Col xs='12' md='12'>
             <Input
               type={'textarea'}
@@ -123,7 +136,7 @@ const AddProduct = props => {
               disabled={user.role === ROLES.Merchant}
               error={formErrors['brand']}
               name={'brand'}
-              label={'Select Brand'}
+              label={'Select Category'}
               value={
                 user.role === ROLES.Merchant ? brands[1] : productFormData.brand
               }
@@ -134,25 +147,35 @@ const AddProduct = props => {
             />
           </Col>
           <Col xs='12' md='12'>
+
+
             <Input
-              type={'file'}
+              type={'files'}
               error={formErrors['file']}
               name={'image'}
-              label={'file'}
-              placeholder={'Please Upload Image'}
+              label={'Upload Images'}
               value={image}
               onInputChange={(name, value) => {
                 productChange(name, value);
               }}
             />
           </Col>
-          <Col xs='12' md='12' className='my-2'>
+          <Col xs='6' md='6' className='my-2'>
             <Switch
               id={'active-product'}
               name={'isActive'}
               label={'Active?'}
               checked={productFormData.isActive}
               toggleCheckboxChange={value => productChange('isActive', value)}
+            />
+          </Col>
+          <Col xs='6' md='6' className='my-2'>
+            <Switch
+              id={'featured-product'}
+              name={'featured'}
+              label={'Featured?'}
+              checked={productFormData.featured}
+              toggleCheckboxChange={value => productChange('featured', value)}
             />
           </Col>
         </Row>

@@ -82,8 +82,8 @@ class Navigation extends React.PureComponent {
           <img
             className='item-image'
             src={`${
-              suggestion.imageUrl
-                ? suggestion.imageUrl
+              suggestion.imageUrl[0]
+                ? suggestion.imageUrl[0]
                 : '/images/placeholder-image.png'
             }`}
           />
@@ -140,11 +140,10 @@ class Navigation extends React.PureComponent {
         <div className='header-info'>
           <Container>
             <Row>
-              <Col md='4' className='text-center d-none d-md-block'>
-                <i className='fa fa-truck' />
-                <span>Free Shipping</span>
+              <Col xs='12' className='text-center d-none d-md-block'>
+                <span className=''>Manpasand Furnitures</span>
               </Col>
-              <Col md='4' className='text-center d-none d-md-block'>
+              {/* <Col md='4' className='text-center d-none d-md-block'>
                 <i className='fa fa-credit-card' />
                 <span>Payment Methods</span>
               </Col>
@@ -155,7 +154,7 @@ class Navigation extends React.PureComponent {
               <Col xs='12' className='text-center d-block d-md-none'>
                 <i className='fa fa-phone' />
                 <span> Need advice? Call us 951-999-9999</span>
-              </Col>
+              </Col> */}
             </Row>
           </Container>
         </div>
@@ -169,18 +168,8 @@ class Navigation extends React.PureComponent {
               className='pr-0'
             >
               <div className='brand'>
-                {categories && categories.length > 0 && (
-                  <Button
-                    borderless
-                    variant='empty'
-                    className='d-none d-md-block'
-                    ariaLabel='open the menu'
-                    icon={<BarsIcon />}
-                    onClick={() => this.toggleMenu()}
-                  />
-                )}
                 <Link to='/'>
-                  <h1 className='logo'>EV Store</h1>
+                  <h1 className='logo'>Manpasand Furnitures</h1>
                 </Link>
               </div>
             </Col>
@@ -243,7 +232,7 @@ class Navigation extends React.PureComponent {
                       isOpen={isBrandOpen}
                     >
                       <DropdownToggle nav>
-                        Brands
+                        Categories
                         <span className='fa fa-chevron-down dropdown-caret'></span>
                       </DropdownToggle>
                       <DropdownMenu right className='nav-brand-dropdown'>
@@ -283,7 +272,7 @@ class Navigation extends React.PureComponent {
                   ) : (
                     <UncontrolledDropdown nav inNavbar>
                       <DropdownToggle nav>
-                        Hello, Sign In!
+                        Sign In!
                         <span className='fa fa-chevron-down dropdown-caret'></span>
                       </DropdownToggle>
                       <DropdownMenu right>

@@ -114,22 +114,20 @@ router.get('/:id', async (req, res) => {
 
 router.get(
   '/list/select',
-  auth,
-  role.check(ROLES.Admin, ROLES.Merchant),
   async (req, res) => {
     try {
       let brands = null;
 
-      if (req.user.merchant) {
-        brands = await Brand.find(
-          {
-            merchant: req.user.merchant
-          },
-          'name'
-        );
-      } else {
+      // if (req.user.merchant) {
+      //   brands = await Brand.find(
+      //     {
+      //       merchant: req.user.merchant
+      //     },
+      //     'name'
+      //   );
+      // } else {
         brands = await Brand.find({}, 'name');
-      }
+      // }
 
       res.status(200).json({
         brands

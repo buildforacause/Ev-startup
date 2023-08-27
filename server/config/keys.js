@@ -37,5 +37,9 @@ module.exports = {
     secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
     region: process.env.AWS_REGION,
     bucketName: process.env.AWS_BUCKET_NAME
+  },
+  razorpay: {
+    key: process.env.REACT_APP_RAZORPAY_API_KEY,
+    secret: process.env.REACT_APP_RAZORPAY_API_SECRET
   }
 };

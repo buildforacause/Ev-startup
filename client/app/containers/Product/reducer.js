@@ -7,8 +7,11 @@
 import {
   FETCH_PRODUCTS,
   FETCH_STORE_PRODUCTS,
+  FETCH_FEATURED_PRODUCTS,
+  FETCH_FREQUENT_ITEMS,
   FETCH_PRODUCT,
   FETCH_STORE_PRODUCT,
+  FETCH_MINMAX,
   PRODUCT_CHANGE,
   PRODUCT_EDIT_CHANGE,
   PRODUCT_SHOP_CHANGE,
@@ -27,6 +30,7 @@ import {
 
 const initialState = {
   products: [],
+  getMinMax: {},
   storeProducts: [],
   product: {
     _id: ''
@@ -41,6 +45,7 @@ const initialState = {
     price: 1,
     image: {},
     isActive: true,
+    featured: false,
     taxable: { value: 0, label: 'No' },
     brand: {
       value: 0,
@@ -59,7 +64,7 @@ const initialState = {
     category: 'all',
     brand: 'all',
     min: 1,
-    max: 2500,
+    max: 999999999999,
     rating: 0,
     order: 0,
     totalPages: 1,
@@ -76,11 +81,26 @@ const productReducer = (state = initialState, action) => {
         ...state,
         products: action.payload
       };
+      case FETCH_MINMAX:
+        return {
+          ...state,
+          getMinMax: action.payload
+        };
+      case FETCH_FREQUENT_ITEMS:
+        return {
+          ...state,
+          frequentlyPurchased: action.payload
+        }
     case FETCH_STORE_PRODUCTS:
       return {
         ...state,
         storeProducts: action.payload
       };
+    case FETCH_FEATURED_PRODUCTS:
+      return {
+        ...state,
+        featuredProducts: action.payload
+      }
     case FETCH_PRODUCT:
       return {
         ...state,
@@ -167,6 +187,7 @@ const productReducer = (state = initialState, action) => {
           price: 1,
           image: {},
           isActive: true,
+          featured: false,
           taxable: { value: 0, label: 'No' },
           brand: {
             value: 0,
@@ -202,7 +223,7 @@ const productReducer = (state = initialState, action) => {
           category: 'all',
           brand: 'all',
           min: 1,
-          max: 2500,
+          max: 999999999999,
           rating: 0,
           order: 0,
           totalPages: 1,

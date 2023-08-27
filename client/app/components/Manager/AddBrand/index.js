@@ -30,7 +30,7 @@ const AddBrand = props => {
               error={formErrors['name']}
               label={'Name'}
               name={'name'}
-              placeholder={'Brand Name'}
+              placeholder={'Category Name'}
               value={brandFormData.name}
               onInputChange={(name, value) => {
                 brandChange(name, value);
@@ -43,7 +43,7 @@ const AddBrand = props => {
               error={formErrors['description']}
               label={'Description'}
               name={'description'}
-              placeholder={'Brand Description'}
+              placeholder={'Category Description'}
               value={brandFormData.description}
               onInputChange={(name, value) => {
                 brandChange(name, value);
@@ -62,7 +62,7 @@ const AddBrand = props => {
         </Row>
         <hr />
         <div className='add-brand-actions'>
-          <Button type='submit' text='Add Brand' />
+          <Button type='submit' text='Add Category' />
         </div>
       </form>
     </div>

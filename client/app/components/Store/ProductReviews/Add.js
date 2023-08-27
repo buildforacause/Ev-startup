@@ -14,11 +14,12 @@ const recommedableSelect = [
 
 
 const Add = props => {
-  const [ button, setButton] = useState(true);
+  const [ button, setButton ] = useState(true);
+  const [ checking , setChecking ] = useState([]);
   const { reviewFormData, reviewChange, reviewFormErrors, addReview, prodId } = props;
 
 const fetch = async() => {
-  const checkOrder = Array();
+  let checkOrder = Array();
   try{
   const page = 1;
   const response = await axios.get(`/api/order/me`, {
@@ -29,24 +30,23 @@ const fetch = async() => {
   });
 
   const { orders, totalPages, currentPage, count } = response.data;
+  setChecking(orders);
+  setChecking(orders);
+  checking.map(order => {
+    order.products.map(product => {
+      if(product.product._id === prodId){
+        checkOrder.push("1")
+      }
+    })
+  })
 
-  Array(orders).map((e) => {
-    Array(e[0]).forEach((ex) => {
-      let qex = ex.products;
-      Array(qex[0]).forEach((exa) => {
-        if(exa.product._id === prodId){
-          checkOrder.push("1");
-        }
-      });
-    });
-  });
   return checkOrder;
 
   // console.log(Array(orders).forEach((e) => Array(e.products).forEach((ex) => Array(ex.product).some(checkOrder))));
   // console.log(Array(orders[0].products[0].product._id))
   
   }catch(error){
-    return [];
+    return checkOrder;
   }
 }
   const handleSubmit = event => {

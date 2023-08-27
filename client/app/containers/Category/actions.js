@@ -60,17 +60,14 @@ export const resetCategory = () => {
 };
 
 // fetch store categories api
-export const fetchStoreCategories = () => {
+export const fetchStoreCategories = (slug) => {
   return async (dispatch, getState) => {
     try {
-      const response = await axios.get(`/api/category/list`);
-
-      dispatch({
-        type: FETCH_STORE_CATEGORIES,
-        payload: response.data.categories
-      });
+      const response = await axios.get(`/api/category/list/${slug}`);
+      return response.data;
     } catch (error) {
       handleError(error, dispatch);
+      return;
     }
   };
 };

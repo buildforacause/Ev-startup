@@ -11,6 +11,9 @@ import axios from 'axios';
 import {
   FETCH_PRODUCTS,
   FETCH_STORE_PRODUCTS,
+  FETCH_MINMAX,
+  FETCH_FREQUENT_ITEMS,
+  FETCH_FEATURED_PRODUCTS,
   FETCH_PRODUCT,
   FETCH_STORE_PRODUCT,
   PRODUCT_CHANGE,
@@ -140,6 +143,76 @@ export const fetchStoreProduct = slug => {
   };
 };
 
+// fetch minmax
+
+export const fetchMinMax = () => {
+  return async (dispatch, getState) => {
+    try {
+      const response = await axios.get(`/api/product/minmaxprice`);
+      dispatch({
+        type: FETCH_MINMAX,
+        payload: response.data
+      });
+    } catch (error) {
+      handleError(error, dispatch);
+    }
+  };
+};
+
+
+// fetch featured product api
+export const fetchFeaturedProduct = () => {
+  return async (dispatch, getState) => {
+    dispatch(setProductLoading(true));
+
+    try {
+      const response = await axios.get(`/api/product/list/featured`);
+      dispatch({
+        type: FETCH_FEATURED_PRODUCTS,
+        payload: response.data.products
+      });
+    } catch (error) {
+      handleError(error, dispatch);
+    } finally {
+      dispatch(setProductLoading(false));
+    }
+  };
+};
+
+function getMax(arr, prop) {
+  var max;
+  for (var i=0 ; i<arr.length ; i++) {
+      if (max == null || parseInt(arr[i][prop]) > parseInt(max[prop]))
+          max = arr[i];
+  }
+  return max;
+}
+
+
+// fetch frequent items api
+export const frequentItems = () => {
+  return async (dispatch, getState) => {
+    try {
+      const response = await axios.get(`/api/product/apriori/trending`);
+      const frequent = getMax(response.data.result.itemsets, "support");
+      const payload_prods = []
+      for (let index = 0; index < frequent.items.length; index++) {
+        let response_inner = await axios.get(`/api/product/list/search1/${frequent.items[index]}`);
+        payload_prods.push(response_inner.data.products)
+      }
+      dispatch({
+        type: FETCH_FREQUENT_ITEMS,
+        payload: payload_prods
+      });
+    } catch (error) {
+      handleError(error, dispatch);
+    } finally {
+      dispatch(setProductLoading(false));
+    }
+  };
+};
+
+
 export const fetchBrandProducts = slug => {
   return async (dispatch, getState) => {
     try {
@@ -247,7 +320,8 @@ export const addProduct = () => {
         price: 'required|numeric',
         taxable: 'required',
         image: 'required',
-        brand: 'required'
+        brand: 'required',
+        dimensions: 'required'
       };
 
       const product = getState().product.productFormData;
@@ -264,7 +338,9 @@ export const addProduct = () => {
         quantity: product.quantity,
         image: product.image,
         isActive: product.isActive,
+        featured: product.featured,
         taxable: product.taxable.value,
+        dimensions: product.dimensions,
         brand:
           user.role !== ROLES.Merchant
             ? brand != 0
@@ -278,6 +354,7 @@ export const addProduct = () => {
         'alpha_dash.sku':
           'Sku may have alpha-numeric characters, as well as dashes and underscores only.',
         'required.name': 'Name is required.',
+        'required.dimensions': 'Dimension is required.',
         'required.description': 'Description is required.',
         'max.description':
           'Description may not be greater than 200 characters.',
@@ -297,13 +374,16 @@ export const addProduct = () => {
           if (newProduct.hasOwnProperty(key)) {
             if (key === 'brand' && newProduct[key] === null) {
               continue;
+            } else if(key === 'image'){
+              for (let index = 0; index < newProduct[key].length; index++) {
+                formData.append(key, newProduct[key][index]);
+              }
             } else {
-              formData.set(key, newProduct[key]);
+              formData.append(key, newProduct[key]);
             }
           }
         }
       }
-
       const response = await axios.post(`/api/product/add`, formData, {
         headers: { 'Content-Type': 'multipart/form-data' }
       });
@@ -341,7 +421,8 @@ export const updateProduct = () => {
         quantity: 'required|numeric',
         price: 'required|numeric',
         taxable: 'required',
-        brand: 'required'
+        brand: 'required',
+        dimensions: 'required'
       };
 
       const product = getState().product.product;
@@ -356,6 +437,8 @@ export const updateProduct = () => {
         quantity: product.quantity,
         price: product.price,
         taxable: product.taxable,
+        featured: product.featured,
+        dimensions: product.dimensions,
         brand: brand != 0 ? brand : null
       };
 
@@ -371,6 +454,7 @@ export const updateProduct = () => {
         'max.description':
           'Description may not be greater than 200 characters.',
         'required.quantity': 'Quantity is required.',
+        'required.dimensions': 'DImension is required.',
         'required.price': 'Price is required.',
         'required.taxable': 'Taxable is required.',
         'required.brand': 'Brand is required.'
@@ -411,6 +495,32 @@ export const activateProduct = (id, value) => {
       const response = await axios.put(`/api/product/${id}/active`, {
         product: {
           isActive: value
+        }
+      });
+
+      const successfulOptions = {
+        title: `${response.data.message}`,
+        position: 'tr',
+        autoDismiss: 1
+      };
+
+      if (response.data.success === true) {
+        dispatch(success(successfulOptions));
+      }
+    } catch (error) {
+      handleError(error, dispatch);
+    }
+  };
+};
+
+// feature product api
+
+export const featureProduct = (id, value) => {
+  return async (dispatch, getState) => {
+    try {
+      const response = await axios.put(`/api/product/${id}/featured`, {
+        product: {
+          featured: value
         }
       });
 

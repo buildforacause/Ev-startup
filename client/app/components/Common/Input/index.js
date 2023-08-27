@@ -28,7 +28,7 @@ const Input = props => {
 
   const _onChange = e => {
     if (e.target.name == 'image') {
-      onInputChange(e.target.name, e.target.files[0]);
+      onInputChange(e.target.name, e.target.files);
     } else {
       onInputChange(e.target.name, e.target.value);
     }
@@ -54,7 +54,24 @@ const Input = props => {
         <span className='invalid-message'>{error && error[0]}</span>
       </div>
     );
-  } else if (type === 'number') {
+  }else if (type === 'files') {
+    return (
+      <div>
+        {label && <label>{label}</label>}
+        <input
+          type='file'
+          onChange={e => {
+            _onChange(e);
+          }}
+          name={name}
+          value={value}
+          multiple
+        />
+        <span className='invalid-message'>{error && error[0]}</span>
+      </div>
+    );
+  } 
+  else if (type === 'number') {
     const styles = `input-box${error ? ' invalid' : ''}`;
 
     const handleOnInput = e => {

@@ -33,13 +33,13 @@ const Footer = () => {
   const quickLinks = (
     <ul className='support-links'>
       <li className='footer-link'>
-        <Link to='/dashboard/orders'>Privacy Policy</Link>
+        <Link to='/privacy/policy'>Privacy Policy</Link>
       </li>
       <li className='footer-link'>
-        <Link to='/dashboard/orders'>Return Policy</Link>
+        <Link to='/return/policy'>Return Policy</Link>
       </li>
       <li className='footer-link'>
-        <Link to='/dashboard/orders'>Terms Of Service</Link>
+        <Link to='/terms'>Terms Of Service</Link>
       </li>
     </ul>
   );
@@ -53,7 +53,7 @@ const Footer = () => {
         <Link to='/brands'>Shop By Brands</Link>
       </li>
       <li className='footer-link'>
-        <Link to='/dashboard/orders'>Shop By Categories</Link>
+        <Link to='/dashboard/orders'>Shop By SubCategories</Link>
       </li>
     </ul>
   );
@@ -104,7 +104,7 @@ const Footer = () => {
           </div>
         </div>
         <div className='footer-copyright'>
-          <span>© {new Date().getFullYear()} <a href="/" className='text-success' style={{fontWeight: 500}}>EV Store</a></span>
+          <span>© {new Date().getFullYear()} <a href="/" className='text-success' style={{fontWeight: 500}}>Manpasand Furnitures</a></span>
         </div>
       </Container>
     </footer>

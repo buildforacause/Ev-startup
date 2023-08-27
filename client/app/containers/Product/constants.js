@@ -6,8 +6,11 @@
 
 export const FETCH_PRODUCTS = 'src/Product/FETCH_PRODUCTS';
 export const FETCH_STORE_PRODUCTS = 'src/Product/FETCH_STORE_PRODUCTS';
+export const FETCH_FREQUENT_ITEMS = 'src/Product/FETCH_FREQUENT_ITEMS';
 export const FETCH_PRODUCT = 'src/Product/FETCH_PRODUCT';
+export const FETCH_MINMAX = 'src/Product/FETCH_MINMAX';
 export const FETCH_STORE_PRODUCT = 'src/Product/FETCH_STORE_PRODUCT';
+export const FETCH_FEATURED_PRODUCTS = 'src/Product/FETCH_FEATURED_PRODUCTS';
 export const PRODUCT_CHANGE = 'src/Product/PRODUCT_CHANGE';
 export const PRODUCT_EDIT_CHANGE = 'src/Product/PRODUCT_EDIT_CHANGE';
 export const PRODUCT_SHOP_CHANGE = 'src/Product/PRODUCT_SHOP_CHANGE';
