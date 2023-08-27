@@ -31,7 +31,6 @@ class SubCatPage extends React.PureComponent {
     brands.map(brand => {
       brandnames.push({"value": brand.name, "label": brand.name})
     })
-    console.log(brandnames)
     this.setState({
       slug : this.props.match.params.slug,
       brands : brands,

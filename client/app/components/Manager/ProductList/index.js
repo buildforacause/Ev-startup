@@ -7,12 +7,18 @@
 import React from 'react';
 
 import { Link } from 'react-router-dom';
+import SelectOption from '../../Common/SelectOption';
 
 const ProductList = props => {
-  const { products } = props;
+  const { products, productnames } = props;
+  const goTo = (e) => {
+    let slug = e.value;
+    window.location.href = `/dashboard/product/edit/${slug}`;
+}   
 
   return (
     <div className='p-list'>
+      <SelectOption label={'Search'} options={productnames} multi={false} handleSelectChange={value => {goTo(value);}}></SelectOption>
       {products.map((product, index) => (
         <Link
           to={`/dashboard/product/edit/${product._id}`}

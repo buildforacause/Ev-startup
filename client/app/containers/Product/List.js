@@ -15,6 +15,7 @@ import SubPage from '../../components/Manager/SubPage';
 import LoadingIndicator from '../../components/Common/LoadingIndicator';
 import NotFound from '../../components/Common/NotFound';
 
+
 class List extends React.PureComponent {
   componentDidMount() {
     this.props.fetchProducts();
@@ -22,6 +23,12 @@ class List extends React.PureComponent {
 
   render() {
     const { history, products, isLoading } = this.props;
+    let productnames = [];
+    if (products.length > 0){
+      products.map((data) => {
+        productnames.push({"label": data.name, "value": data._id})
+      });
+    }
 
     return (
       <>
@@ -33,7 +40,9 @@ class List extends React.PureComponent {
           {isLoading ? (
             <LoadingIndicator inline />
           ) : products.length > 0 ? (
-            <ProductList products={products} />
+            <>
+            <ProductList products={products} productnames={productnames}/>
+            </>
           ) : (
             <NotFound message='No products found.' />
           )}
